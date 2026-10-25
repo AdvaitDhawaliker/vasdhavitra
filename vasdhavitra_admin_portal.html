@@ -1,0 +1,314 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal | VASDHAVITRA</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fcfbfa',
+                            100: '#f4efe6',
+                            200: '#e6dcc6',
+                            300: '#d0c2a2',
+                            600: '#795548',
+                            700: '#5d4037',
+                            800: '#4e342e',
+                            900: '#3e2723'
+                        },
+                        accent: {
+                            500: '#c29b38'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fcfbfa; color: #3e2723; }
+        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+    </style>
+</head>
+<body class="bg-brand-50 text-brand-900 antialiased flex flex-col min-h-screen justify-between">
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- Header -->
+    <header class="bg-brand-900 text-white py-4 px-6 flex items-center justify-between border-b border-brand-800">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-full overflow-hidden border border-brand-200 bg-white flex items-center justify-center shrink-0">
+                <img src="logo.jpeg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/f4efe6/3e2723?text=V'">
+            </div>
+            <div>
+                <span class="text-lg font-serif font-bold text-white">VASDHAVITRA</span>
+                <span class="block text-[9px] tracking-widest uppercase text-brand-200 font-semibold">Admin Management Portal</span>
+            </div>
+        </div>
+        <a href="home.html" class="text-xs font-semibold text-brand-200 hover:text-white flex items-center space-x-1">
+            <i class="fa-solid fa-arrow-left"></i><span>Back to Storefront</span>
+        </a>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow flex items-center justify-center p-4 py-12" id="admin-login-wrapper">
+        <div class="bg-white rounded-3xl shadow-xl max-w-md w-full p-8 border border-brand-200 space-y-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 rounded-full bg-brand-900 text-brand-200 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-serif font-bold text-brand-900">Admin Portal Login</h2>
+                    <p class="text-xs text-brand-600">Secure store manager authentication</p>
+                </div>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-brand-600 mb-1">Admin Email</label>
+                    <input type="text" id="admin-user" required class="w-full px-4 py-3 rounded-xl bg-brand-50 border border-brand-200 text-sm text-brand-900" value="admin@vasdhavitra.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-brand-600 mb-1">Password</label>
+                    <input type="password" id="admin-pass" required class="w-full px-4 py-3 rounded-xl bg-brand-50 border border-brand-200 text-sm text-brand-900" value="admin123">
+                </div>
+                <div class="p-3 bg-brand-100 rounded-xl text-xs text-brand-700">
+                    <i class="fa-solid fa-circle-info text-brand-700 mr-1"></i> Default credentials: <b>admin@vasdhavitra.com</b> / <b>admin123</b>
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-brand-900 hover:bg-brand-800 text-white font-bold rounded-xl shadow-md transition-all">
+                    Access Dashboard 🛡️
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Admin Dashboard View (Initially Hidden until login) -->
+    <div id="admin-dashboard-view" class="hidden flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+        <div class="bg-brand-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-brand-800">
+            <div>
+                <span class="text-xs font-bold tracking-widest uppercase text-brand-200">Store Manager Dashboard</span>
+                <h1 class="text-2xl sm:text-3xl font-serif font-bold">VASDHAVITRA Order & Customer Management</h1>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="loadDashboardData()" class="px-4 py-2 bg-brand-800 text-brand-200 rounded-xl text-xs font-semibold border border-brand-700">Refresh Data</button>
+                <button onclick="adminLogout()" class="px-4 py-2 bg-brand-100 text-brand-900 font-bold rounded-xl text-xs">Sign Out</button>
+            </div>
+        </div>
+
+        <!-- Metrics -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-brand-200">
+                <p class="text-xs text-brand-600 font-medium uppercase tracking-wider">Total Revenue</p>
+                <h3 id="adm-rev" class="text-3xl font-bold font-serif text-brand-900 mt-2">₹0</h3>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-brand-200">
+                <p class="text-xs text-brand-600 font-medium uppercase tracking-wider">Total Orders</p>
+                <h3 id="adm-orders-count" class="text-3xl font-bold font-serif text-brand-900 mt-2">0</h3>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-brand-200">
+                <p class="text-xs text-brand-600 font-medium uppercase tracking-wider">Verified Registered Users</p>
+                <h3 id="adm-users-count" class="text-3xl font-bold font-serif text-brand-900 mt-2">0</h3>
+            </div>
+        </div>
+
+        <!-- Verified Users Table Section -->
+        <div class="bg-white rounded-3xl shadow-sm border border-brand-200 overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-serif font-bold text-brand-900"><i class="fa-solid fa-users text-brand-700 mr-2"></i> Verified Registered Users (Email Confirmed)</h3>
+                </div>
+                <div id="adm-users-container" class="overflow-x-auto"></div>
+            </div>
+        </div>
+
+        <!-- Orders Table Section -->
+        <div class="bg-white rounded-3xl shadow-sm border border-brand-200 overflow-hidden">
+            <div class="p-6">
+                <h3 class="text-lg font-serif font-bold text-brand-900 mb-4"><i class="fa-solid fa-box-open text-brand-700 mr-2"></i> Confirm & Update Customer Orders</h3>
+                <div id="adm-orders-container" class="overflow-x-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-brand-900 text-brand-200 py-6 text-center text-xs">
+        <p>&copy; 2026 VASDHAVITRA – A Woven Breeze. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let orders = JSON.parse(localStorage.getItem('vas_orders')) || [];
+        let users = JSON.parse(localStorage.getItem('vas_users')) || [];
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'bg-brand-900 text-brand-50 px-5 py-3 rounded-2xl shadow-xl text-xs font-medium';
+            t.innerText = msg;
+            container.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem('vas_admin_logged') === 'true') {
+                showDashboard();
+            }
+        };
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('admin-user').value.trim();
+            const p = document.getElementById('admin-pass').value;
+
+            if (u === 'admin@vasdhavitra.com' && p === 'admin123') {
+                localStorage.setItem('vas_admin_logged', 'true');
+                showToast('🛡️ Admin login successful!');
+                showDashboard();
+            } else {
+                showToast('❌ Invalid admin username or password.');
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('admin-login-wrapper').classList.add('hidden');
+            document.getElementById('admin-dashboard-view').classList.remove('hidden');
+            loadDashboardData();
+        }
+
+        function adminLogout() {
+            localStorage.removeItem('vas_admin_logged');
+            document.getElementById('admin-dashboard-view').classList.add('hidden');
+            document.getElementById('admin-login-wrapper').classList.remove('hidden');
+            showToast('Signed out of admin portal.');
+        }
+
+        function loadDashboardData() {
+            orders = JSON.parse(localStorage.getItem('vas_orders')) || [];
+            
+            // Collect all users (include both registered user array and current session user if verified)
+            let allUsersMap = new Map();
+            let rawUsers = JSON.parse(localStorage.getItem('vas_users')) || [];
+            rawUsers.forEach(u => { if (u.email) allUsersMap.set(u.email.toLowerCase(), u); });
+            
+            let currentUser = JSON.parse(localStorage.getItem('vas_current_user'));
+            if (currentUser && currentUser.email) {
+                allUsersMap.set(currentUser.email.toLowerCase(), currentUser);
+            }
+
+            // Filter strictly for users who have verified their email
+            users = Array.from(allUsersMap.values()).filter(u => u.verified === true);
+
+            const totalRev = orders.reduce((sum, o) => sum + o.total, 0);
+            document.getElementById('adm-rev').innerText = `₹${totalRev.toLocaleString('en-IN')}`;
+            document.getElementById('adm-orders-count').innerText = orders.length;
+            document.getElementById('adm-users-count').innerText = users.length;
+
+            // Render Verified Users Table
+            const userContainer = document.getElementById('adm-users-container');
+            if (users.length === 0) {
+                userContainer.innerHTML = `<p class="text-xs text-brand-600 text-center py-6">No email-verified users registered yet.</p>`;
+            } else {
+                userContainer.innerHTML = `
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-brand-200 text-xs font-semibold text-brand-600 uppercase">
+                                <th class="py-3 px-4">Full Name</th>
+                                <th class="py-3 px-4">Gmail / Email</th>
+                                <th class="py-3 px-4">Phone Number</th>
+                                <th class="py-3 px-4">Shipping Address</th>
+                                <th class="py-3 px-4">Verification Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-brand-100 text-xs">
+                            ${users.map(u => `
+                                <tr class="hover:bg-brand-50">
+                                    <td class="py-4 px-4 align-top font-bold text-brand-900">${u.name || 'N/A'}</td>
+                                    <td class="py-4 px-4 align-top text-brand-900">${u.email}</td>
+                                    <td class="py-4 px-4 align-top text-brand-600">${u.phone || 'Not provided'}</td>
+                                    <td class="py-4 px-4 align-top text-brand-600">${u.address || 'Not provided'}</td>
+                                    <td class="py-4 px-4 align-top">
+                                        <span class="inline-flex items-center px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded-full text-[11px] font-semibold border border-emerald-200">
+                                            <i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> Verified
+                                        </span>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            // Render Orders Table
+            const container = document.getElementById('adm-orders-container');
+            if (orders.length === 0) {
+                container.innerHTML = `<p class="text-xs text-brand-600 text-center py-6">No customer orders placed yet.</p>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-brand-200 text-xs font-semibold text-brand-600 uppercase">
+                            <th class="py-3 px-4">Order ID & Date</th>
+                            <th class="py-3 px-4">Customer Details</th>
+                            <th class="py-3 px-4">Items</th>
+                            <th class="py-3 px-4">Total</th>
+                            <th class="py-3 px-4">Confirm & Update Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-brand-100 text-xs">
+                        ${orders.map(o => `
+                            <tr class="hover:bg-brand-50">
+                                <td class="py-4 px-4 align-top">
+                                    <span class="font-bold text-brand-900">${o.id}</span>
+                                    <p class="text-brand-600 text-[11px]">${o.date}</p>
+                                </td>
+                                <td class="py-4 px-4 align-top">
+                                    <p class="font-bold text-brand-900">${o.customer.name}</p>
+                                    <p class="text-brand-600">${o.customer.email}</p>
+                                    <p class="text-brand-600">Ph: ${o.customer.phone}</p>
+                                </td>
+                                <td class="py-4 px-4 align-top">
+                                    ${o.items.map(i => `• ${i.product.name} (×${i.quantity})`).join('<br>')}
+                                </td>
+                                <td class="py-4 px-4 align-top font-bold font-serif text-sm">₹${o.total}</td>
+                                <td class="py-4 px-4 align-top space-y-2">
+                                    <span class="inline-block px-2.5 py-1 bg-amber-50 text-amber-900 rounded-lg text-[11px] font-medium border border-amber-200 mb-1">Status: ${o.status}</span>
+                                    <div class="flex flex-wrap gap-1">
+                                        <button onclick="updateStatus('${o.id}', 'Confirmed')" class="px-2.5 py-1 bg-brand-900 text-white rounded text-[10px]">Confirm Order</button>
+                                        <button onclick="updateStatus('${o.id}', 'Shipped')" class="px-2.5 py-1 bg-brand-600 text-white rounded text-[10px]">Mark Shipped</button>
+                                        <button onclick="updateStatus('${o.id}', 'Delivered')" class="px-2.5 py-1 bg-emerald-700 text-white rounded text-[10px]">Mark Delivered</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function updateStatus(orderId, status) {
+            orders = JSON.parse(localStorage.getItem('vas_orders')) || [];
+            const ord = orders.find(o => o.id === orderId);
+            if (ord) {
+                ord.status = status;
+                localStorage.setItem('vas_orders', JSON.stringify(orders));
+                loadDashboardData();
+                showToast(`Order ${orderId} status updated to: ${status}`);
+            }
+        }
+    </script>
+</body>
+</html>
+
