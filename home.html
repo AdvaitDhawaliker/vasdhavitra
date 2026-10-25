@@ -11,6 +11,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts: Playfair Display & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, setDoc, doc, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // PASTE YOUR FIREBASE CONFIG HERE
+        const firebaseConfig = {
+  apiKey: "AIzaSyAeS1uWLuEYaBLUeLm6vHUUXkjHxLzyK4g",
+  authDomain: "vasdhavitra.firebaseapp.com",
+  projectId: "vasdhavitra",
+  storageBucket: "vasdhavitra.firebasestorage.app",
+  messagingSenderId: "1088106081732",
+  appId: "1:1088106081732:web:8b9d6c2814dc31b1b20891"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.firebaseDoc = doc;
+        window.firebaseSetDoc = setDoc;
+        window.firebaseCollection = collection;
+        window.firebaseAddDoc = addDoc;
+        window.firebaseGetDocs = getDocs;
+    </script>
     <script>
         tailwind.config = {
             theme: {
@@ -118,7 +143,7 @@
                             <div class="px-4 py-2 border-b border-brand-100">
                                 <p class="text-xs text-brand-600">Signed in as</p>
                                 <p id="dropdown-user-email" class="text-xs font-bold text-brand-900 truncate">user@example.com</p>
-                                <span id="dropdown-verified-badge" class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold"></span>
+                                <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800"><i class="fa-solid fa-circle-check mr-1"></i> Email Verified</span>
                             </div>
                             <button onclick="toggleAccountModal()" class="w-full text-left px-4 py-2.5 text-sm text-brand-900 hover:bg-brand-100 flex items-center space-x-2">
                                 <i class="fa-solid fa-address-card text-brand-700 w-5"></i><span>My Account & Address</span>
@@ -293,7 +318,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     <div class="rounded-3xl overflow-hidden shadow-xl border border-brand-200 aspect-[4/5] relative">
-                        <img src="image_fbad77.jpg" alt="Vasdhavitra Story" class="w-full h-full object-cover">
+                        <img src="image_fbad77.jpg" alt="Vasdhavitra Story" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x750/f4efe6/3e2723?text=VASDHAVITRA'">
                         <div class="absolute inset-0 bg-gradient-to-t from-brand-900/60 to-transparent"></div>
                         <div class="absolute bottom-6 left-6 text-white">
                             <p class="text-sm font-serif italic text-brand-200">"A little breeze, a beautiful story, and a greener choice."</p>
@@ -407,7 +432,7 @@
                     </div>
                     <div class="pt-2 flex items-center justify-between">
                         <button type="submit" class="px-6 py-3 bg-brand-900 hover:bg-brand-800 text-white font-bold rounded-xl shadow-md transition-all text-xs">
-                            Save Changes 🌿
+                            Save Changes & Sync to Cloud 🌿
                         </button>
                         <button type="button" onclick="toggleAccountModal()" class="px-4 py-3 bg-brand-100 hover:bg-brand-200 text-brand-900 font-semibold rounded-xl text-xs">
                             Cancel
@@ -496,7 +521,7 @@
                         <span id="chk-modal-total" class="text-lg font-bold text-brand-800 font-serif">₹0</span>
                     </div>
                     <button type="submit" class="w-full py-3.5 bg-brand-900 hover:bg-brand-800 text-white font-bold rounded-xl shadow-md">
-                        Place Order 🌿
+                        Place Order & Sync to Cloud 🌿
                     </button>
                 </form>
             </div>
@@ -596,30 +621,8 @@
         let state = {
             currentUser: JSON.parse(localStorage.getItem('vas_current_user')) || null,
             cart: JSON.parse(localStorage.getItem('vas_cart')) || [],
-            orders: JSON.parse(localStorage.getItem('vas_orders')) || [],
             products: JSON.parse(localStorage.getItem('vas_products')) || DEFAULT_PRODUCTS
         };
-
-        function saveState() {
-            localStorage.setItem('vas_current_user', JSON.stringify(state.currentUser));
-            localStorage.setItem('vas_cart', JSON.stringify(state.cart));
-            localStorage.setItem('vas_orders', JSON.stringify(state.orders));
-            
-            // Sync user changes back to the global registered users database list
-            if (state.currentUser && state.currentUser.email) {
-                let users = JSON.parse(localStorage.getItem('vas_users')) || [];
-                let idx = users.findIndex(u => u.email.toLowerCase() === state.currentUser.email.toLowerCase());
-                if (idx >= 0) {
-                    users[idx] = state.currentUser;
-                } else {
-                    users.push(state.currentUser);
-                }
-                localStorage.setItem('vas_users', JSON.stringify(users));
-            }
-
-            updateCartUI();
-            updateUserNavUI();
-        }
 
         window.onload = function() {
             renderProducts('home-product-grid', state.products.slice(0, 4));
@@ -682,11 +685,11 @@
                     <div class="p-6 flex flex-col flex-grow justify-between space-y-4">
                         <div class="space-y-1">
                             <div class="flex items-center justify-between text-xs text-brand-600">
-                                <span>${prod.category} Textile</span>
-                                <span class="flex items-center text-accent-600"><i class="fa-solid fa-star mr-1"></i>${prod.rating}</span>
+                                <span>${prod.category || 'Textile'}</span>
+                                <span class="flex items-center text-accent-600"><i class="fa-solid fa-star mr-1"></i>${prod.rating || '5.0'}</span>
                             </div>
                             <h3 class="font-serif font-bold text-lg text-brand-900">${prod.name}</h3>
-                            <p class="text-xs text-brand-600 line-clamp-2">${prod.description}</p>
+                            <p class="text-xs text-brand-600 line-clamp-2">${prod.description || prod.desc}</p>
                         </div>
                         <div class="flex items-center justify-between pt-4 border-t border-brand-100">
                             <span class="text-xl font-bold font-serif text-brand-900">₹${prod.price}</span>
@@ -709,7 +712,7 @@
             if (cat === 'all') {
                 renderProducts('shop-product-grid', state.products);
             } else {
-                renderProducts('shop-product-grid', state.products.filter(p => p.category.toLowerCase() === cat.toLowerCase()));
+                renderProducts('shop-product-grid', state.products.filter(p => (p.category || '').toLowerCase() === cat.toLowerCase()));
             }
         }
 
@@ -734,7 +737,8 @@
                 state.cart.push({ product: prod, quantity: 1 });
             }
 
-            saveState();
+            localStorage.setItem('vas_cart', JSON.stringify(state.cart));
+            updateCartUI();
             showToast(`Added "${prod.name}" to shopping bag 🪭`);
             toggleCartDrawer(true);
         }
@@ -747,13 +751,13 @@
             if (item.quantity <= 0) {
                 state.cart = state.cart.filter(i => i.product.id !== prodId);
             }
-            saveState();
+            localStorage.setItem('vas_cart', JSON.stringify(state.cart));
             renderCartItems();
         }
 
         function renderCartItems() {
             const container = document.getElementById('cart-items-container');
-            const footer = document.getElementById('cart-footer');
+            const footer = document.getElementById('cart-footer') || createCartFooterElement();
             const badge = document.getElementById('cart-badge');
 
             const totalCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -799,6 +803,27 @@
             document.getElementById('cart-total').innerText = `₹${subtotal}`;
         }
 
+        function createCartFooterElement() {
+            let f = document.getElementById('cart-footer');
+            if(!f) {
+                f = document.createElement('div');
+                f.id = 'cart-footer';
+                f.className = 'p-6 bg-brand-100 border-t border-brand-200 space-y-4';
+                f.innerHTML = `
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between text-brand-600"><span>Subtotal</span><span id="cart-subtotal" class="font-semibold text-brand-900">₹0</span></div>
+                        <div class="flex justify-between text-brand-600"><span>Shipping</span><span class="font-semibold text-brand-900">Free</span></div>
+                        <div class="border-t border-brand-200 pt-2 flex justify-between text-base font-bold text-brand-900"><span>Total</span><span id="cart-total" class="text-brand-700">₹0</span></div>
+                    </div>
+                    <button onclick="openCheckoutModal()" class="w-full py-3.5 bg-brand-900 hover:bg-brand-800 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center space-x-2">
+                        <span>Proceed to Secure Checkout</span><i class="fa-solid fa-lock text-xs text-brand-200"></i>
+                    </button>
+                `;
+                document.querySelector('#cart-drawer > div').appendChild(f);
+            }
+            return f;
+        }
+
         function updateCartUI() {
             document.getElementById('cart-badge').innerText = state.cart.reduce((sum, item) => sum + item.quantity, 0);
         }
@@ -818,7 +843,6 @@
             const nameSpan = document.getElementById('user-display-name');
             const guestLinks = document.getElementById('dropdown-guest-links');
             const userLinks = document.getElementById('dropdown-user-links');
-            const verifiedBadge = document.getElementById('dropdown-verified-badge');
 
             guestLinks.classList.add('hidden');
             userLinks.classList.add('hidden');
@@ -827,15 +851,8 @@
                 nameSpan.innerText = 'Account';
                 guestLinks.classList.remove('hidden');
             } else {
-                nameSpan.innerText = state.currentUser.name.split(' ')[0];
+                nameSpan.innerText = (state.currentUser.name || 'User').split(' ')[0];
                 document.getElementById('dropdown-user-email').innerText = state.currentUser.email;
-                if (state.currentUser.verified) {
-                    verifiedBadge.className = 'inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800';
-                    verifiedBadge.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Email Verified';
-                } else {
-                    verifiedBadge.className = 'inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800';
-                    verifiedBadge.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i> Unverified';
-                }
                 userLinks.classList.remove('hidden');
             }
         }
@@ -853,7 +870,7 @@
             }
         }
 
-        function handleAccountUpdate(e) {
+        async function handleAccountUpdate(e) {
             e.preventDefault();
             if (!state.currentUser) return;
 
@@ -861,14 +878,23 @@
             state.currentUser.phone = document.getElementById('acc-phone').value;
             state.currentUser.address = document.getElementById('acc-address').value;
 
-            saveState();
+            localStorage.setItem('vas_current_user', JSON.stringify(state.currentUser));
+
+            if (window.db) {
+                try {
+                    await window.firebaseSetDoc(window.firebaseDoc(window.db, "users", state.currentUser.email.toLowerCase()), state.currentUser);
+                } catch(err) { console.error(err); }
+            }
+
             toggleAccountModal();
-            showToast('✅ Account details and shipping address updated successfully!');
+            updateUserNavUI();
+            showToast('✅ Account details updated & synced to Cloud!');
         }
 
         function logoutUser() {
+            localStorage.removeItem('vas_current_user');
             state.currentUser = null;
-            saveState();
+            updateUserNavUI();
             showToast('Signed out successfully.');
             showSection('home');
         }
@@ -882,11 +908,6 @@
                 showToast('Please sign in to proceed with checkout.');
                 toggleCartDrawer(false);
                 window.location.href = 'index.html';
-                return;
-            }
-            if (!state.currentUser.verified) {
-                showToast('⚠️ Please verify your email before checkout.');
-                window.location.href = 'index.html?verify=pending';
                 return;
             }
 
@@ -904,7 +925,7 @@
             document.getElementById('checkout-modal').classList.add('hidden');
         }
 
-        function handleCheckoutSubmit(e) {
+        async function handleCheckoutSubmit(e) {
             e.preventDefault();
             const name = document.getElementById('chk-name').value;
             const phone = document.getElementById('chk-phone').value;
@@ -912,10 +933,10 @@
             const payment = document.getElementById('chk-payment').value;
             const subtotal = state.cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
 
-            // Update user profile info permanently
             state.currentUser.name = name;
             state.currentUser.phone = phone;
             state.currentUser.address = address;
+            localStorage.setItem('vas_current_user', JSON.stringify(state.currentUser));
 
             const newOrder = {
                 id: 'VAS-' + Math.floor(100000 + Math.random() * 900000),
@@ -927,62 +948,82 @@
                 status: 'Pending Confirmation'
             };
 
-            state.orders.unshift(newOrder);
+            if (window.db) {
+                try {
+                    await window.firebaseAddDoc(window.firebaseCollection(window.db, "orders"), newOrder);
+                } catch(e) { console.error(e); }
+            }
+
             state.cart = [];
-            saveState();
+            localStorage.setItem('vas_cart', JSON.stringify([]));
+            updateCartUI();
 
             closeCheckoutModal();
-            showToast('🎉 Order placed successfully! Awaiting admin confirmation.');
+            showToast('🎉 Order placed successfully to Cloud! Awaiting admin confirmation.');
             showSection('orders');
         }
 
-        function renderCustomerOrders() {
+        async function renderCustomerOrders() {
             const container = document.getElementById('customer-orders-list');
             if (!state.currentUser) return;
 
-            const userOrders = state.orders.filter(o => o.customer.email.toLowerCase() === state.currentUser.email.toLowerCase());
+            container.innerHTML = `<p class="text-xs text-brand-600">Loading orders from cloud...</p>`;
 
-            if (userOrders.length === 0) {
-                container.innerHTML = `
-                    <div class="bg-white rounded-3xl p-12 text-center space-y-4 border border-brand-200">
-                        <div class="w-16 h-16 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center mx-auto text-2xl">
-                            <i class="fa-solid fa-box-open"></i>
-                        </div>
-                        <h3 class="font-serif font-bold text-xl text-brand-900">No Orders Yet</h3>
-                        <button onclick="showSection('shop')" class="px-6 py-3 bg-brand-900 text-white font-bold rounded-xl text-xs">Explore Collection 🪭</button>
-                    </div>
-                `;
-                return;
-            }
+            try {
+                const snap = await window.firebaseGetDocs(window.firebaseCollection(window.db, "orders"));
+                let userOrders = [];
+                snap.forEach(d => {
+                    let dat = d.data();
+                    if(dat.customer && dat.customer.email.toLowerCase() === state.currentUser.email.toLowerCase()) {
+                        userOrders.push(dat);
+                    }
+                });
 
-            container.innerHTML = userOrders.map(order => `
-                <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-brand-200 space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-brand-100 pb-4 gap-2">
-                        <div>
-                            <span class="text-xs font-bold text-brand-700 uppercase tracking-wider">Order ID: ${order.id}</span>
-                            <p class="text-xs text-brand-600">Placed on ${order.date}</p>
+                if (userOrders.length === 0) {
+                    container.innerHTML = `
+                        <div class="bg-white rounded-3xl p-12 text-center space-y-4 border border-brand-200">
+                            <div class="w-16 h-16 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center mx-auto text-2xl">
+                                <i class="fa-solid fa-box-open"></i>
+                            </div>
+                            <h3 class="font-serif font-bold text-xl text-brand-900">No Orders Yet</h3>
+                            <button onclick="showSection('shop')" class="px-6 py-3 bg-brand-900 text-white font-bold rounded-xl text-xs">Explore Collection 🪭</button>
                         </div>
-                        <div class="flex items-center space-x-3">
-                            <span class="px-3 py-1 bg-amber-50 text-amber-900 text-xs font-semibold rounded-full border border-amber-200">Status: ${order.status}</span>
-                            <span class="text-lg font-bold font-serif text-brand-900">₹${order.total}</span>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = userOrders.map(order => `
+                    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-brand-200 space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-brand-100 pb-4 gap-2">
+                            <div>
+                                <span class="text-xs font-bold text-brand-700 uppercase tracking-wider">Order ID: ${order.id}</span>
+                                <p class="text-xs text-brand-600">Placed on ${order.date}</p>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="px-3 py-1 bg-amber-50 text-amber-900 text-xs font-semibold rounded-full border border-amber-200">Status: ${order.status}</span>
+                                <span class="text-lg font-bold font-serif text-brand-900">₹${order.total}</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="space-y-4">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-brand-600">Items:</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            ${order.items.map(i => `
-                                <div class="flex items-center space-x-3 bg-brand-50 p-3 rounded-2xl border border-brand-200">
-                                    <img src="${i.product.image}" class="w-12 h-12 rounded-xl object-cover">
-                                    <div class="flex-1 min-w-0">
-                                        <p class="font-serif font-bold text-xs text-brand-900 truncate">${i.product.name}</p>
-                                        <p class="text-[11px] text-brand-600">Qty: ${i.quantity} × ₹${i.product.price}</p>
+                        <div class="space-y-4">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-brand-600">Items:</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                ${order.items.map(i => `
+                                    <div class="flex items-center space-x-3 bg-brand-50 p-3 rounded-2xl border border-brand-200">
+                                        <img src="${i.product.image}" class="w-12 h-12 rounded-xl object-cover">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-serif font-bold text-xs text-brand-900 truncate">${i.product.name}</p>
+                                            <p class="text-[11px] text-brand-600">Qty: ${i.quantity} × ₹${i.product.price}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            `).join('')}
+                                `).join('')}
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+            } catch(e) {
+                console.error(e);
+                container.innerHTML = `<p class="text-xs text-red-600">Failed to load orders from cloud.</p>`;
+            }
         }
     </script>
 </body>

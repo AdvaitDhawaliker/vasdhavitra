@@ -8,8 +8,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // PASTE YOUR FIREBASE CONFIG HERE
+        const firebaseConfig = {
+  apiKey: "AIzaSyAeS1uWLuEYaBLUeLm6vHUUXkjHxLzyK4g",
+  authDomain: "vasdhavitra.firebaseapp.com",
+  projectId: "vasdhavitra",
+  storageBucket: "vasdhavitra.firebasestorage.app",
+  messagingSenderId: "1088106081732",
+  appId: "1:1088106081732:web:8b9d6c2814dc31b1b20891"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.firebaseDoc = doc;
+        window.firebaseSetDoc = setDoc;
+        window.firebaseGetDoc = getDoc;
+    </script>
     <script>
-        // Initialized with your EmailJS Public Key
         (function(){
             emailjs.init("8w88p-CTlu6764M0V"); 
         })();
@@ -121,22 +143,27 @@
             }
         }
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
-            const email = document.getElementById('login-email').value;
+            const email = document.getElementById('login-email').value.trim();
             
-            // Retrieve existing registered user data or create session
-            let users = JSON.parse(localStorage.getItem('vas_users')) || [];
-            let foundUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-
-            const userObj = {
-                name: foundUser ? foundUser.name : email.split('@')[0],
+            let userObj = {
+                name: email.split('@')[0],
                 email: email,
-                phone: foundUser ? foundUser.phone : '',
-                address: foundUser ? foundUser.address : '',
+                phone: '',
+                address: '',
                 verified: true,
                 role: 'consumer'
             };
+
+            if (window.db) {
+                try {
+                    const docSnap = await window.firebaseGetDoc(window.firebaseDoc(window.db, "users", email.toLowerCase()));
+                    if (docSnap.exists()) {
+                        userObj = docSnap.data();
+                    }
+                } catch(err) { console.error(err); }
+            }
 
             localStorage.setItem('vas_current_user', JSON.stringify(userObj));
             alert('Login successful! Redirecting to VASDHAVITRA Woven Breeze...');
@@ -174,20 +201,16 @@
             });
         }
 
-        function verifyEmailCode() {
+        async function verifyEmailCode() {
             const enteredCode = document.getElementById('verification-code-input').value.trim();
             if (enteredCode === generatedCode) {
-                // Save user to registered users database list for admin view
-                let users = JSON.parse(localStorage.getItem('vas_users')) || [];
-                // Check if user already exists
-                if (!users.some(u => u.email.toLowerCase() === pendingUser.email.toLowerCase())) {
-                    users.push(pendingUser);
-                    localStorage.setItem('vas_users', JSON.stringify(users));
+                if (window.db) {
+                    try {
+                        await window.firebaseSetDoc(window.firebaseDoc(window.db, "users", pendingUser.email.toLowerCase()), pendingUser);
+                    } catch(e) { console.error(e); }
                 }
 
                 alert('Email verified successfully! Please log in to continue.');
-                
-                // Switch tab back to Login and prefill email
                 switchTab('login');
                 document.getElementById('login-email').value = pendingUser.email;
                 document.getElementById('login-success-banner').classList.remove('hidden');
