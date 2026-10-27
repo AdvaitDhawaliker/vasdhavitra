@@ -81,7 +81,7 @@
     <!-- Announcement Bar -->
     <div class="bg-brand-900 text-brand-100 text-xs sm:text-sm py-2 px-4 text-center font-medium tracking-wide flex items-center justify-center space-x-2">
         <i class="fa-solid fa-leaf text-accent-500"></i>
-        <span>Handcrafted from Pre-Loved Sarees & Surplus Textiles. Free shipping across India on orders over ₹1,499!</span>
+        <span>Handcrafted from Pre-Loved Sarees & Surplus Textiles. Free shipping across India on orders over ₹499!</span>
         <i class="fa-solid fa-fan text-accent-500 animate-spin" style="animation-duration: 6s;"></i>
     </div>
 
@@ -214,7 +214,7 @@
                         <div class="lg:col-span-5 flex justify-center">
                             <div class="relative w-full max-w-md bg-brand-800 p-3 rounded-3xl shadow-2xl border border-brand-700">
                                 <div class="bg-brand-900 rounded-2xl overflow-hidden aspect-[4/5] relative">
-                                    <img src="image_fbad77.jpg" alt="Vasdhavitra Handcrafted Fans" class="w-full h-full object-cover opacity-95" onerror="this.src='https://placehold.co/600x750/3e2723/e6dcc6?text=VASDHAVITRA'">
+                                    <img src="https://i.imgur.com/Lk1Llh9.jpeg" alt="Vasdhavitra Handcrafted Fans" class="w-full h-full object-cover opacity-95" onerror="this.src='https://placehold.co/600x750/3e2723/e6dcc6?text=VASDHAVITRA'">
                                     <div class="absolute inset-0 bg-gradient-to-t from-brand-900 via-transparent to-transparent opacity-80"></div>
                                     <div class="absolute bottom-6 left-6 right-6 text-white space-y-1">
                                         <span class="text-xs uppercase tracking-widest text-brand-200 font-semibold">Handcrafted With Love</span>
@@ -318,7 +318,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     <div class="rounded-3xl overflow-hidden shadow-xl border border-brand-200 aspect-[4/5] relative">
-                        <img src="image_fbad77.jpg" alt="Vasdhavitra Story" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x750/f4efe6/3e2723?text=VASDHAVITRA'">
+                        <img src="https://i.imgur.com/NSsfRc8.jpeg" alt="Vasdhavitra Story" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x750/f4efe6/3e2723?text=VASDHAVITRA'">
                         <div class="absolute inset-0 bg-gradient-to-t from-brand-900/60 to-transparent"></div>
                         <div class="absolute bottom-6 left-6 text-white">
                             <p class="text-sm font-serif italic text-brand-200">"A little breeze, a beautiful story, and a greener choice."</p>
@@ -427,9 +427,20 @@
                         <input type="tel" id="acc-phone" placeholder="9876543210" class="w-full px-4 py-2.5 rounded-xl bg-brand-50 border border-brand-200 text-sm text-brand-900">
                     </div>
                     <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-brand-600 mb-1">Age</label>
+                        <input type="number" id="acc-age" placeholder=" " class="w-full px-4 py-2.5 rounded-xl bg-brand-50 border border-brand-200 text-sm text-brand-900">
+                    </div>
+                    
+                    <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-brand-600 mb-1">Shipping Address</label>
                         <textarea id="acc-address" rows="3" placeholder="House No, Street, City, Pincode" class="w-full px-4 py-2.5 rounded-xl bg-brand-50 border border-brand-200 text-sm text-brand-900"></textarea>
                     </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-brand-600 mb-1">State</label>
+                        <input type="text" id="acc-state" placeholder="Eg.goa,kerala" class="w-full px-4 py-2.5 rounded-xl bg-brand-50 border border-brand-200 text-sm text-brand-900">
+                    </div>
+                    
+
                     <div class="pt-2 flex items-center justify-between">
                         <button type="submit" class="px-6 py-3 bg-brand-900 hover:bg-brand-800 text-white font-bold rounded-xl shadow-md transition-all text-xs">
                             Save Changes
@@ -577,43 +588,43 @@
     <script>
         const DEFAULT_PRODUCTS = [
             {
-                id: 'fan-1',
-                name: 'sunflower',
+                id: 'fan01',
+                name: 'green',
                 category: 'yellow',
                 price: 299,
                 rating: 4.9,
                 reviewsCount: 38,
-                image: 'https://img.kwcdn.com/product/21137b2350a/ab0bdff3-eb73-4395-9cb0-f39e8ebbf5ce_1000x1000.jpeg?imageView2/2/w/500/q/60/format/webp',
+                image: 'https://i.imgur.com/DPZHfMW.jpeg',
                 description: 'Exquisite hand-pleated fan crafted from royal blue Banarasi silk saree borders featuring intricate gold zari motifs and polished bamboo ribs.'
             },
             {
-                id: 'fan-2',
-                name: 'violet 1',
+                id: 'fan02',
+                name: 'violet',
                 category: 'violet',
                 price: 349,
                 rating: 4.8,
                 reviewsCount: 24,
-                image: 'https://images.meesho.com/images/products/529414512/3skpd_512.webp?width=512',
+                image: 'https://i.imgur.com/TbCjvqx.jpeg',
                 description: 'Warm terracotta and forest green paisley prints upcycled from vintage cotton-silk sarees with authentic hand-stitched borders.'
             },
             {
-                id: 'fan-3',
-                name: 'red dragon',
+                id: 'fan03',
+                name: 'white',
                 category: 'red',
                 price: 349,
                 rating: 5.0,
                 reviewsCount: 56,
-                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpUJIM4uYbHW0RAXmbGEdFA25tlpuZj1Ow1EVwFwegIWhONNcHMCHt_UOL&s=10',
+                image: 'https://i.imgur.com/5994NcA.jpeg',
                 description: 'Vibrant multihued upcycled silk saree remnants featuring traditional geometrical Patola patterns and metallic gold zari weave.'
             },
             {
-                id: 'fan-4',
-                name: 'bluebird',
+                id: 'fan04',
+                name: 'blue',
                 category: 'blue',
                 price: 349,
                 rating: 4.7,
                 reviewsCount: 42,
-                image: 'https://qwdirect.com.au/wp-content/uploads/2025/12/qwdcbhf-039-custom-printed-bamboo-accordion-fan-open.jpg',
+                image: 'https://i.imgur.com/T7zPCin.jpeg',
                 description: 'Lightweight breathable Chanderi silk blend upcycled from festive surplus textiles. A sophisticated everyday cooling accessory.'
             }
         ];
@@ -1028,3 +1039,4 @@
     </script>
 </body>
 </html>
+
